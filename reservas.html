@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Reservas</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+</head>
+
+<body>
+    <h1>Reservas BeWithYou</h1>
+
+    <table id="tabelaFormulario">    
+        <tr> <td>ID:</td> <td><input type="text" id="txtId"></td> </tr>
+        <tr> <td>Nome:</td> <td><input type="text" id="txtNome"></td> </tr>
+        <tr> <td>Data de Início:</td> <td><input type="text" id="txtDataIni"></td> </tr>
+        <tr> <td>Data de Fim:</td> <td><input type="text" id="txtDataFim"></td> </tr> 
+        
+        <tr><td></td><td>
+            <input type="button" value="Salvar" onclick="salvarReserva()" id="btnSalvar">
+            <input type="button" value="Apagar" onclick="apagarReserva()" id="btnApagar">
+            <input type="button" value="Cancelar" onclick="cancelarEdicao()" id="btnCancelar">
+        </td></tr>
+    </table> 
+
+
+    <p style="font-weight:bold" id="paragrafoMensagem"></p>
+
+    <table id="tabelaReservas">  
+        <tr><td><input type="button" 
+                       value="Novo" 
+                       onclick="novaReserva()" 
+                       id="btnNovo"></td> <td></td> <td></td></tr>
+        <tr> <th>ID</th> <th>Nome</th> <th>Data Início</th> <th>Data Fim</th> </tr>
+        <tbody id="corpoTabelaReversas"> </tbody>
+    </table>
+
+    <script src="rest.js"></script>
+    <script>
+        const tabelaReservas = document.querySelector('#tabelaReservas');
+        const tabelaFormulario = document.querySelector('#tabelaFormulario');
+        const corpoTabela = document.querySelector('#corpoTabelaReservas');
+        const paragrafoMensagem = document.querySelector('#paragrafoMensagem');
+        const txtNome = document.querySelector('#txtNome');
+        const txtDataIni = document.querySelector('#txtDataIni');
+        const txtDataFim = document.querySelector('#txtDataFim');
+        const txtId = document.querySelector('#txtId');
+		
+        const btnNovo = document.querySelector('#btnNovo');
+        const btnSalvar = document.querySelector('#btnSalvar');
+        const btnApagar = document.querySelector('#btnApagar');
+        const btnCancelar = document.querySelector('#btnCancelar');
+        var criandoNovaReserva = false;
+
+        inicializar();
+
+        function inicializar() {
+            criandoNovaReserva = false;
+            paragrafoMensagem.textContent = 'Pressione o botão Novo ou selecione uma reserva da lista:'
+            txtId.value = '';
+            txtNome.value = '';
+            txtDataIni.value = '';
+            txtDataFim.value = '';
+            txtId.disabled = true;
+            txtNome.disabled = true;
+            txtDataIni.disabled = true;
+            txtDataFim.disabled = true;
+			
+            btnNovo.disabled = false;
+            btnSalvar.disabled = true;
+            btnApagar.disabled = true;
+            btnCancelar.disabled = true;
+
+            tabelaFormulario.style.display = 'none';
+            tabelaReservas.style.display = 'inline';
+
+            listarTodasReservas();            
+        }
+
+        function listarTodasReservas() {
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = "Erro ao listar reservas (código " + error.message + ")";
+            }
+            asyncLerReservas(preencherTabela, errorHandler);
+        }
+
+        function preencherTabela(reservas) {
+            corpoTabela.innerHTML = "";
+            var n = reservas.length;
+            for (var i = 0; i < n; i++) {
+                let f = reservas[i];
+                let linha = corpoTabela.insertRow();
+                let celulaId = linha.insertCell();
+                let celulaNome = linha.insertCell();
+                let celulaDataIni = linha.insertCell();
+                let celulaDataFim = linha.insertCell();
+				
+
+                let alink = document.createElement('a');
+                alink.textContent = f.id;
+                alink.href = "javascript:void(0)";
+                alink.onclick =  function() { selecionarReserva(f.id); };
+                celulaId.appendChild(alink);
+                celulaNome.textContent = f.nome;
+                celulaDataIni.textContent = f.dataIni;
+                celulaDataFim.textContent = f.dataFim;
+            }
+        }
+
+        function selecionarReserva(id) {
+            criandoNovaReserva = false;
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = "Erro ao selecionar reserva (código " + error.message + ")";
+            }
+            asyncLerFacById(id, preencherFormulario, errorHandler);				
+        }
+
+        function preencherFormulario(reserva) {
+            paragrafoMensagem.textContent = 
+				'Altere e salve os dados da reserva, ou então apague o registro da reserva.'
+            txtId.value = reserva.id;
+            txtNome.value = reserva.nome;
+            txtDataIni.value = reserva.dataIni;
+            txtDataFim.value = reserva.dataFim;
+			
+			
+            txtId.disabled = true;
+            txtNome.disabled = false;
+            txtDataIni.disabled = false;
+            txtDataFim.disabled = false;
+			
+            btnNovo.disabled = true;
+            btnSalvar.disabled = false;
+            btnApagar.disabled = false;
+            btnCancelar.disabled = false;  
+
+            tabelaFormulario.style.display = 'inline';
+            tabelaReservas.style.display = 'none';
+
+        }
+		
+        function novaReserva() {
+            paragrafoMensagem.textContent = 'Preencha os dados da nova reserva...';
+            criandoNovaReserva = true;
+
+            txtId.value = '';
+            txtNome.value = '';
+            txtDataIni.value = '';
+            txtDataFim.value = '';
+			
+            txtId.disabled = true;
+            txtNome.disabled = false;
+            txtDataIni.disabled = false;
+            txtDataFim.disabled = false;
+			
+            btnNovo.disabled = true;
+            btnSalvar.disabled = false;
+            btnApagar.disabled = true;
+            btnCancelar.disabled = false;
+
+            tabelaFormulario.style.display = 'inline';
+            tabelaReservas.style.display = 'none';
+        }
+
+        function salvarReserva() {
+            if (criandoNovaReserva) { criarReserva(); }
+            else { alterarReserva(); }
+        }
+
+        function criarReserva() {
+            const dadosReserva = {
+                'nome': txtNome.value,
+                'dataIni': txtDataIni.value,
+                'dataFim': txtDataFim.value,
+            };
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = 'Erro ao criar nova reserva (código ' + error.message + ')'; 
+            }
+            asyncCriarReserva(dadosReserva, inicializar, errorHandler);
+        }
+
+        function alterarReserva() {
+            const errorHandler = function(error) {
+                paragrafoMensagem.textContent = 'Erro ao alterar reserva (código ' + error.message + ')'; 
+            }
+            const dadosReserva = {
+                'id': txtId.value,
+                'nome': txtNome.value,
+                'dataIni': txtDataIni.value,
+                'dataFim': txtDataFim.value,
+            };
+            asyncAlterarReserva(dadosReserva, inicializar, errorHandler);        	
+        }
+
+        function cancelarEdicao() {
+            inicializar();
+        }
+
+        function apagarReserva() {
+            const id = txtId.value;
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = 'Erro ao apagar reserva (código ' + error.message + ')'; 
+            } 
+            asyncApagarReserva(id, inicializar, errorHandler);       		
+        }
+
+    </script>    
+</body>
+
+</html>
+

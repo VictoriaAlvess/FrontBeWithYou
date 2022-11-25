@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Contratos</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+</head>
+
+<body>
+    <h1>Contratos BeWithYou</h1>
+
+    <table id="tabelaFormulario">    
+        <tr> <td>ID:</td> <td><input type="text" id="txtId"></td> </tr>
+        <tr> <td>Tipo de Serviço:</td> <td><input type="text" id="txtTipoServ"></td> </tr> 
+        <tr> <td>Data de Inicio:</td> <td><input type="text" id="txtDataIni"></td> </tr>
+        <tr> <td>Data de Fim:</td> <td><input type="text" id="txtDataF"></td> </tr> 
+		<tr> <td>Reserva:</td> <td><select id="selectReserva"></select></td> </tr> 
+        <tr> <td>Definição de Serviço:</td> <td><select id="selectDefServ"></select></td> </tr>
+        <tr><td></td><td>
+            <input type="button" value="Salvar" onclick="salvarContrato()" id="btnSalvar">
+            <input type="button" value="Apagar" onclick="apagarContrato()" id="btnApagar">
+            <input type="button" value="Cancelar" onclick="cancelarEdicao()" id="btnCancelar">
+        </td></tr>
+    </table> 
+
+
+    <p style="font-weight:bold" id="paragrafoMensagem"></p>
+
+    <table id="tabelaContratos">  
+        <tr><td><input type="button" 
+                       value="Novo" 
+                       onclick="novoContrato()" 
+                       id="btnNovo"></td> <td></td> <td></td></tr>
+        <tr> <th>ID</th> <th>Tipo serviço</th> <th>Definição serviço</th> <th>Reserva</th> <th>Data Inicio</th> <th>Data Fim</th> </tr>
+        <tbody id="corpoTabelaContratos"> </tbody>
+    </table>
+
+    <script src="rest.js"></script>
+    <script>
+        const tabelaContratos = document.querySelector('#tabelaContratos');
+        const tabelaFormulario = document.querySelector('#tabelaFormulario');
+        const corpoTabela = document.querySelector('#corpoTabelaContratos');
+        const paragrafoMensagem = document.querySelector('#paragrafoMensagem');
+        const txtTipoServ = document.querySelector('#txtTipoServ');
+        const selectDefServ = document.querySelector('#selectDefServ');
+        const txtDataIni = document.querySelector('#txtDataIni');
+        const txtDataF = document.querySelector('#txtDataF');
+        const txtId = document.querySelector('#txtId');
+		const selectReserva = document.querySelector('#selectReserva');
+		
+        const btnNovo = document.querySelector('#btnNovo');
+        const btnSalvar = document.querySelector('#btnSalvar');
+        const btnApagar = document.querySelector('#btnApagar');
+        const btnCancelar = document.querySelector('#btnCancelar');
+        var criandoNovoContrato = false;
+
+        inicializar();
+
+        function inicializar() {
+            criandoNovoContrato = false;
+            paragrafoMensagem.textContent = 
+				'Pressione o botão Novo ou selecione um contrato da lista:'
+            txtId.value = '';
+            txtTipoServ.value = '';
+            txtDataIni.value = '';
+            txtDataF.value = '';
+            txtId.disabled = true;
+            txtTipoServ.disabled = true;
+            selectDefServ.disabled = true;
+            // carregarDefSer();
+            txtDataIni.disabled = true;
+            txtDataF.disabled = true;
+			carregarReservas();
+			selectReserva.disabled = true;
+
+            btnNovo.disabled = false;
+            btnSalvar.disabled = true;
+            btnApagar.disabled = true;
+            btnCancelar.disabled = true;
+
+            tabelaFormulario.style.display = 'none';
+            tabelaContratos.style.display = 'inline';
+
+            listarTodosContratos();            
+        }
+		
+        function listarTodosContratos() {
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = "Erro ao listar contratos (código " + error.message + ")";
+            }
+            asyncLerContratos(preencherTabela, errorHandler);
+        }
+
+        function preencherTabela(contratos) {
+            corpoTabela.innerHTML = "";
+            var n = contratos.length;
+            for (var i = 0; i < n; i++) {
+                let p = contratos[i];
+                let linha = corpoTabela.insertRow();
+                let celulaId = linha.insertCell();
+                let celulaTipoServ = linha.insertCell();
+                let celulaDefServ = linha.insertCell();
+                let celulaDataIni = linha.insertCell();
+                let celulaDataF = linha.insertCell();
+				let celulaReserva = linha.insertCell();
+
+                let alink = document.createElement('a');
+                alink.textContent = p.id;
+                alink.href = "javascript:void(0)";
+                alink.onclick =  function() { selecionarContrato(p.id); };
+                celulaId.appendChild(alink);
+                celulaTipoServ.textContent = p.tipoServ;
+                celulaDefServ.textContent = p.defServ.nome;
+                celulaDataIni.textContent = p.dataIni;
+                celulaDataF.textContent = p.dataf;
+				celulaReserva.textContent = p.reserva.nome
+            }
+        }
+
+        function selecionarContrato(id) {
+            criandoNovoContrato = false;
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = "Erro ao selecionar contrato (código " + error.message + ")";
+            }
+            asyncLerContratoById(id, preencherFormulario, errorHandler);				
+        }
+
+        function preencherFormulario(contrato) {
+            paragrafoMensagem.textContent = 
+				'Altere e salve os dados do contrato, ou então apague o registro do contrato.'
+            txtId.value = contrato.id;
+            txtTipoServ.value = contrato.tipoServ;
+            selectDefServ.value = contrato.defServ.id;
+            txtDataIni.value = contrato.dataIni;
+            txtDataF.value = contrato.dataF;
+			selectReserva.value = contrato.reserva.id
+
+            txtId.disabled = true;
+            txtTipoServ.disabled = false;
+            selectDefServ.disabled = false;
+            txtDataIni.disabled = false;
+            txtDataF.disabled = false;
+			selectReserva.disabled = false;
+
+            btnNovo.disabled = true;
+            btnSalvar.disabled = false;
+            btnApagar.disabled = false;
+            btnCancelar.disabled = false;  
+
+            tabelaFormulario.style.display = 'inline';
+            tabelaContratos.style.display = 'none';
+        }
+
+        function novoContrato() {
+            paragrafoMensagem.textContent = 'Preencha os dados do novo contrato...';
+            criandoNovoContrato = true;
+			carregarReservas();
+
+            txtId.value = '';
+            txtTipoServ.value = '';
+            selectDefServ.value = '';
+            txtDataIni.value = '';
+            txtDataF.value = '';
+			selectReserva.selectedIndex = -1;
+
+            txtId.disabled = true;
+            txtTipoServ.disabled = false;
+            selectDefServ.disabled = false;
+            txtDataIni.disabled = false;
+            txtDataF.disabled = false;
+			selectReserva.disabled = false;
+
+            btnNovo.disabled = true;
+            btnSalvar.disabled = false;
+            btnApagar.disabled = true;
+            btnCancelar.disabled = false;
+
+            tabelaFormulario.style.display = 'inline';
+            tabelaContratos.style.display = 'none';
+        }
+
+        function salvarContrato() {
+            if (criandoNovoContrato) {
+                criarContrato();
+            }
+            else {
+                alterarContrato();
+            }
+        }
+
+        function criarContrato() {
+            const dadosContrato = {
+                'tipoServ': txtTipoServ.value,
+                'defServ': { 'id': selectDefServ.value },
+                'dataIni': txtDataIni.value,
+                'dataIni': txtDataF.value,
+				'reserva': { 'id': selectReserva.value }
+            };
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = 
+					'Erro ao criar novo contrato (código ' + error.message + ')'; 
+            }
+            asyncCriarContrato(dadosContrato, inicializar, errorHandler);
+        }
+
+        function alterarContrato() {
+            const errorHandler = function(error) {
+                paragrafoMensagem.textContent = 
+					'Erro ao alterar contrato (código ' + error.message + ')'; 
+            }
+            const dadosContrato = {
+                'tipoServ': txtTipoServ.value,
+                'defServ': { 'id': selectDefServ.value },
+                'dataIni': txtDataIni.value,
+                'dataIni': txtDataF.value,
+				'reserva': { 'id': selectReserva.value }
+            };
+            asyncAlterarContrato(dadosContrato, inicializar, errorHandler);        	
+        }
+
+        function cancelarEdicao() {
+            inicializar();
+        }
+
+        function apagarContrato() {
+            const id = txtId.value;
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = 'Erro ao apagar contrato (código ' + error.message + ')'; 
+            } 
+            asyncApagarContrato(id, inicializar, errorHandler);       		
+        }
+
+		function carregarReservas() {
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = 
+					"Erro ao carregar reservas (código " + error.message + ")";
+            }
+            asyncLerContratos(preencherSelectReservas, errorHandler);
+		}
+		
+		function preencherSelectReservas(reservas) {
+			var opcoes = '<option disabled selected value> -- selecione uma opção -- </option>';
+			var n = reservas.length;
+			for (var i = 0; i < n; i++) {
+				var f = reservas[i];
+				opcoes += `<option value="${f.id}">${f.nome}</option>`
+			}
+			selectReserva.innerHTML = opcoes;
+		}	
+		
+    </script>    
+</body>
+
+</html>
+
