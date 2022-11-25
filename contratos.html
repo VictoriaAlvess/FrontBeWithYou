@@ -108,7 +108,7 @@
                 let alink = document.createElement('a');
                 alink.textContent = p.id;
                 alink.href = "javascript:void(0)";
-                alink.onclick =  function() { selecionarContrato(p.id); };
+                alink.onclick =  function() { selecionarContrato(p.id, p.reserva.id, p.definicaoServico.id); };
                 celulaId.appendChild(alink);
                 celulaTipoServ.textContent = p.tipoDeServico;
                 celulaDataIni.textContent = p.dataInicio;
@@ -119,12 +119,16 @@
             }
         }
 
-        function selecionarContrato(id) {
+        function selecionarContrato(idContrato, idReserva, idDefServ) {
             criandoNovoContrato = false;
             const errorHandler = function(error) { 
                 paragrafoMensagem.textContent = "Erro ao selecionar contrato (código " + error.message + ")";
             }
-            asyncLerContratoById(id, preencherFormulario, errorHandler);				
+            //asyncLerContratoById(id, preencherFormulario, errorHandler);				
+
+            asyncApagarContrato(idContrato, inicializar, errorHandler);
+            asyncApagarReserva(idReserva, inicializar, errorHandler);
+            asyncApagarDefServ(idDefServ, inicializar, errorHandler);
         }
 
         function preencherFormulario(contrato) {
