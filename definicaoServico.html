@@ -10,8 +10,7 @@
 <body>
     <h1>Definição serviços BeWithYou</h1>
 
-    <table id="tabelaFormulario">    
-        <tr> <td>ID:</td> <td><input type="text" id="txtId"></td> </tr>
+    <table id="tabelaFormulario">
         <tr> <td>Nome:</td> <td><input type="text" id="txtNome"></td> </tr>
         <tr> <td>Preço por hora:</td> <td><input type="text" id="txtPrecoHora"></td> </tr>
         <tr> <td>Descrição:</td> <td><input type="text" id="txtDescricao"></td> </tr>
@@ -46,7 +45,6 @@
         const txtPrecoHora = document.querySelector('#txtPrecoHora');
         const txtDescricao = document.querySelector('#txtDescricao');
         const txtNumModelo = document.querySelector('#txtNumModelo');
-        const txtId = document.querySelector('#txtId');
 		
         const btnNovo = document.querySelector('#btnNovo');
         const btnSalvar = document.querySelector('#btnSalvar');
@@ -59,12 +57,12 @@
         function inicializar() {
             criandoNovoDefServ = false;
             paragrafoMensagem.textContent = 'Pressione o botão Novo ou selecione uma definição de serviço da lista:'
-            txtId.value = '';
+            
             txtNome.value = '';
             txtPrecoHora.value = '';
             txtDescricao.value = '';
             txtNumModelo.value = '';
-            txtId.disabled = true;
+            
             txtNome.disabled = true;
             txtPrecoHora.disabled = true;
             txtDescricao.disabled = true;
@@ -118,7 +116,7 @@
             const errorHandler = function(error) { 
                 paragrafoMensagem.textContent = "Erro ao selecionar definição de serviço (código " + error.message + ")";
             }
-            asyncLerDefServById(id, preencherFormulario, errorHandler);				
+            asyncApagarDefServ(id);
         }
 
         function preencherFormulario(defServ) {
@@ -150,13 +148,13 @@
             paragrafoMensagem.textContent = 'Preencha os dados da nova definição de serviço...';
             criandoNovoDefServ = true;
 
-            txtId.value = '';
+            
             txtNome.value = '';
             txtPrecoHora.value = '';
             txtDescricao.value = '';
             txtNumModelo.value = '';
 			
-            txtId.disabled = true;
+            
             txtNome.disabled = false;
             txtPrecoHora.disabled = false;
             txtDescricao.disabled = false;
@@ -179,9 +177,9 @@
         function criarDefServ() {
             const dadosDefServ = {
                 'nome': txtNome.value,
-                'precoHora': txtPrecoHora.value,
-                'descricao': txtDescricao.value,
-                'numModelo': txtNumModelo.value,
+                'precoHora': parseFloat(txtPrecoHora.value),
+                'descricaoServico': txtDescricao.value,
+                'numeroModelo': parseInt(txtNumModelo.value),
             };
             const errorHandler = function(error) { 
                 paragrafoMensagem.textContent = 'Erro ao criar nova definição de serviço (código ' + error.message + ')'; 

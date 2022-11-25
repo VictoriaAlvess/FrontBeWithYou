@@ -1,19 +1,15 @@
 //contrato
-async function asyncCriarContrato(dadosContrato, proxsucesso, proxerro) {
+async function asyncCriarContrato(dadosContrato) {
   const URL = `https://Prog2.gabrielzdev.com.br/contratos`;
+  console.log(dadosContrato);
   const postRequest = {
     method: "POST",
     body: JSON.stringify(dadosContrato),
     headers: { "Content-type": "application/json" },
   };
   fetch(URL, postRequest)
-    .then((resposta) => {
-      if (!resposta.ok) throw Error(resposta.status);
-      return resposta;
-    })
     .then((resposta) => resposta.json())
-    .then((jsonResponse) => proxsucesso())
-    .catch(proxerro);
+    .then((jsonResponse) => console.log(jsonResponse));
 }
 
 async function asyncLerContratos(proxsucesso, proxerro) {
@@ -59,34 +55,35 @@ async function asyncAlterarContrato(dadosContrato, proxsucesso, proxerro) {
 
 async function asyncApagarContrato(id, proxsucesso, proxerro) {
   const URL = `https://Prog2.gabrielzdev.com.br/contratos/${id}`;
+  let resp;
   const deleteRequest = {
     method: "POST",
   };
   fetch(URL, deleteRequest)
     .then((resposta) => {
-      if (!resposta.ok) throw Error(resposta.status);
-      return resposta;
+      resposta.json();
     })
-    .then((resposta) => console.log("CONTRATO APAGADO"));
+    .then((json) => {
+      console.log(json + " -- CONTRATO APAGADA");
+      resp = json;
+    });
+
+  return resp;
 }
 
 //reserva
 
-async function asyncCriarReserva(dadosReserva, proxsucesso, proxerro) {
+async function asyncCriarReserva(dadosReserva) {
   const URL = `https://Prog2.gabrielzdev.com.br/reserva`;
+  console.log(dadosReserva);
   const postRequest = {
     method: "POST",
     body: JSON.stringify(dadosReserva),
     headers: { "Content-type": "application/json" },
   };
   fetch(URL, postRequest)
-    .then((resposta) => {
-      if (!resposta.ok) throw Error(resposta.status);
-      return resposta;
-    })
     .then((resposta) => resposta.json())
-    .then((jsonResponse) => proxsucesso())
-    .catch(proxerro);
+    .then((jsonResponse) => console.log(jsonResponse));
 }
 
 async function asyncLerReservas(proxsucesso, proxerro) {
@@ -130,36 +127,49 @@ async function asyncAlterarReserva(dadosReserva, proxsucesso, proxerro) {
     .catch(proxerro);
 }
 
-async function asyncApagarReserva(id, proxsucesso, proxerro) {
+async function asyncApagarReserva(id) {
   const URL = `https://Prog2.gabrielzdev.com.br/reserva/${id}`;
+  let resp;
   const deleteRequest = {
     method: "POST",
   };
   fetch(URL, deleteRequest)
     .then((resposta) => {
-      if (!resposta.ok) throw Error(resposta.status);
-      return resposta;
+      resposta.json();
     })
-    .then((resposta) => console.log("RESERVA APAGADA"));
+    .then((json) => {
+      console.log(json + " -- RESERVA APAGADA");
+      resp = json;
+    });
+
+  const URLdef = `https://Prog2.gabrielzdev.com.br/definicao/${id}`;
+  const deleteRequestDef = {
+    method: "POST",
+  };
+  fetch(URLdef, deleteRequestDef)
+    .then((resposta) => {
+      resposta.json();
+    })
+    .then((json) => {
+      console.log(json + " -- DEFINICAO APAGADA");
+    });
+
+  return resp;
 }
 
 //definição servico
 
-async function asyncCriarDefServ(dadosDefServ, proxsucesso, proxerro) {
+async function asyncCriarDefServ(dadosDefServ) {
   const URL = `https://Prog2.gabrielzdev.com.br/definicao`;
+  console.log(dadosDefServ);
   const postRequest = {
     method: "POST",
     body: JSON.stringify(dadosDefServ),
     headers: { "Content-type": "application/json" },
   };
   fetch(URL, postRequest)
-    .then((resposta) => {
-      if (!resposta.ok) throw Error(resposta.status);
-      return resposta;
-    })
     .then((resposta) => resposta.json())
-    .then((jsonResponse) => proxsucesso())
-    .catch(proxerro);
+    .then((jsonResponse) => console.log(jsonResponse));
 }
 
 async function asyncLerDefServs(proxsucesso, proxerro) {
@@ -203,15 +213,21 @@ async function asyncAlterarDefServ(dadosDefServ, proxsucesso, proxerro) {
     .catch(proxerro);
 }
 
-async function asyncApagarDefServ(id, proxsucesso, proxerro) {
+async function asyncApagarDefServ(id) {
+  console.log(id);
   const URL = `https://Prog2.gabrielzdev.com.br/definicao/${id}`;
+  let resp;
   const deleteRequest = {
     method: "POST",
   };
   fetch(URL, deleteRequest)
     .then((resposta) => {
-      if (!resposta.ok) throw Error(resposta.status);
-      return resposta;
+      resposta.json();
     })
-    .then((resposta) => console.log("DEFINICAO APAGADA"));
+    .then((json) => {
+      console.log(json + " -- DEFINICAO APAGADA");
+      resp = json;
+    });
+
+  return resp;
 }

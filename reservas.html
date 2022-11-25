@@ -10,9 +10,9 @@
 <body>
     <h1>Reservas BeWithYou</h1>
 
-    <table id="tabelaFormulario">    
-        <tr> <td>ID:</td> <td><input type="text" id="txtId"></td> </tr>
+    <table id="tabelaFormulario">
         <tr> <td>Nome:</td> <td><input type="text" id="txtNome"></td> </tr>
+        <tr> <td>Confirmação:</td> <td><input type="checkbox" id="confirmacao"></td> </tr> 
         <tr> <td>Data de Início:</td> <td><input type="text" id="txtDataIni"></td> </tr>
         <tr> <td>Data de Fim:</td> <td><input type="text" id="txtDataFim"></td> </tr> 
         
@@ -31,8 +31,8 @@
                        value="Novo" 
                        onclick="novaReserva()" 
                        id="btnNovo"></td> <td></td> <td></td></tr>
-        <tr> <th>ID</th> <th>Nome</th> <th>Data Início</th> <th>Data Fim</th> </tr>
-        <tbody id="corpoTabelaReversas"> </tbody>
+        <tr> <th> ID </th> <th>Nome</th> <th>Data Início</th> <th>Data Fim</th> <th>Confirmacão</th></tr>
+        <tbody id="corpoTabelaReservas"> </tbody>
     </table>
 
     <script src="rest.js"></script>
@@ -45,6 +45,7 @@
         const txtDataIni = document.querySelector('#txtDataIni');
         const txtDataFim = document.querySelector('#txtDataFim');
         const txtId = document.querySelector('#txtId');
+        const confirmacao = document.querySelector('#confirmacao');
 		
         const btnNovo = document.querySelector('#btnNovo');
         const btnSalvar = document.querySelector('#btnSalvar');
@@ -57,14 +58,17 @@
         function inicializar() {
             criandoNovaReserva = false;
             paragrafoMensagem.textContent = 'Pressione o botão Novo ou selecione uma reserva da lista:'
-            txtId.value = '';
+
+            
+
             txtNome.value = '';
             txtDataIni.value = '';
             txtDataFim.value = '';
-            txtId.disabled = true;
+            
             txtNome.disabled = true;
             txtDataIni.disabled = true;
             txtDataFim.disabled = true;
+            confirmacao.disabled = true;
 			
             btnNovo.disabled = false;
             btnSalvar.disabled = true;
@@ -92,18 +96,20 @@
                 let linha = corpoTabela.insertRow();
                 let celulaId = linha.insertCell();
                 let celulaNome = linha.insertCell();
-                let celulaDataIni = linha.insertCell();
+                let celulaDataInicio = linha.insertCell();
                 let celulaDataFim = linha.insertCell();
+                let celulaConfirmacao = linha.insertCell();
 				
 
                 let alink = document.createElement('a');
                 alink.textContent = f.id;
                 alink.href = "javascript:void(0)";
                 alink.onclick =  function() { selecionarReserva(f.id); };
-                celulaId.appendChild(alink);
+                celulaId.textContent = f.id
                 celulaNome.textContent = f.nome;
                 celulaDataInicio.textContent = f.dataInicio;
                 celulaDataFim.textContent = f.dataFim;
+                celulaConfirmacao.textContent = f.confirmacao
             }
         }
 
@@ -112,7 +118,7 @@
             const errorHandler = function(error) { 
                 paragrafoMensagem.textContent = "Erro ao selecionar reserva (código " + error.message + ")";
             }
-            asyncLerFacById(id, preencherFormulario, errorHandler);				
+            asyncApagarReserva(id, inicializar, errorHandler);  
         }
 
         function preencherFormulario(reserva) {
@@ -120,14 +126,15 @@
 				'Altere e salve os dados da reserva, ou então apague o registro da reserva.'
             txtId.value = reserva.id;
             txtNome.value = reserva.nome;
-            txtDataIni.value = reserva.dataIni;
+            txtDataIni.value = reserva.dataInicio;
             txtDataFim.value = reserva.dataFim;
-			
+			confirmacao.value = reserva.confirmacao
 			
             txtId.disabled = true;
             txtNome.disabled = false;
             txtDataIni.disabled = false;
             txtDataFim.disabled = false;
+            confirmacao.disabled = false
 			
             btnNovo.disabled = true;
             btnSalvar.disabled = false;
@@ -143,15 +150,15 @@
             paragrafoMensagem.textContent = 'Preencha os dados da nova reserva...';
             criandoNovaReserva = true;
 
-            txtId.value = '';
             txtNome.value = '';
             txtDataIni.value = '';
             txtDataFim.value = '';
+            confirmacao.checked = false;
 			
-            txtId.disabled = true;
             txtNome.disabled = false;
             txtDataIni.disabled = false;
             txtDataFim.disabled = false;
+            confirmacao.disabled = false;
 			
             btnNovo.disabled = true;
             btnSalvar.disabled = false;
@@ -170,7 +177,8 @@
         function criarReserva() {
             const dadosReserva = {
                 'nome': txtNome.value,
-                'dataIni': txtDataIni.value,
+                "confirmacao": confirmacao.checked,
+                'dataInicio': txtDataIni.value,
                 'dataFim': txtDataFim.value,
             };
             const errorHandler = function(error) { 
