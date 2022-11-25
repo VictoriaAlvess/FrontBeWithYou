@@ -34,7 +34,7 @@ async function asyncLerContratoById(id, proxsucesso, proxerro) {
 async function asyncAlterarContrato(dadosContrato, proxsucesso, proxerro) {
     const URL = `https://Prog2.gabrielzdev.com.br/contratos/${dadosContrato.id}`;
     const putRequest = {
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify(dadosContrato),
         headers: { 'Content-type': 'application/json' }
     };
@@ -45,10 +45,13 @@ async function asyncAlterarContrato(dadosContrato, proxsucesso, proxerro) {
         .catch(proxerro);	        	
 }
 
+
+
+
 async function asyncApagarContrato(id, proxsucesso, proxerro) {
     const URL = `https://Prog2.gabrielzdev.com.br/contratos/${id}`;
     const deleteRequest = {
-        method: 'DELETE'
+        method: 'POST'
     };
     fetch(URL, deleteRequest)
         .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; } )
@@ -93,7 +96,7 @@ async function asyncLerReservaById(id, proxsucesso, proxerro) {
 async function asyncAlterarReserva(dadosReserva, proxsucesso, proxerro) {
     const URL = `https://Prog2.gabrielzdev.com.br/reserva/${dadosReserva.id}`;
     const putRequest = {
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify(dadosReserva),
         headers: { 'Content-type': 'application/json' }
     };
@@ -107,7 +110,7 @@ async function asyncAlterarReserva(dadosReserva, proxsucesso, proxerro) {
 async function asyncApagarReserva(id, proxsucesso, proxerro) {
     const URL = `https://Prog2.gabrielzdev.com.br/reserva/${id}`;
     const deleteRequest = {
-        method: 'DELETE'
+        method: 'POST'
     };
     fetch(URL, deleteRequest)
         .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; } )
@@ -153,7 +156,7 @@ async function asyncLerDefServById(id, proxsucesso, proxerro) {
 async function asyncAlterarDefServ(dadosDefServ, proxsucesso, proxerro) {
     const URL = `https://Prog2.gabrielzdev.com.br/definicao/${dadosDefServ.id}`;
     const putRequest = {
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify(dadosDefServ),
         headers: { 'Content-type': 'application/json' }
     };
@@ -167,7 +170,7 @@ async function asyncAlterarDefServ(dadosDefServ, proxsucesso, proxerro) {
 async function asyncApagarDefServ(id, proxsucesso, proxerro) {
     const URL = `https://Prog2.gabrielzdev.com.br/definicao/${id}`;
     const deleteRequest = {
-        method: 'DELETE'
+        method: 'POST'
     };
     fetch(URL, deleteRequest)
         .then(resposta => { if (!resposta.ok) throw Error(resposta.status); return resposta; } )

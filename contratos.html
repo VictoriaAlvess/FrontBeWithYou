@@ -32,7 +32,7 @@
                        value="Novo" 
                        onclick="novoContrato()" 
                        id="btnNovo"></td> <td></td> <td></td></tr>
-        <tr> <th>ID</th> <th>Tipo serviço</th> <th>Definição serviço</th> <th>Reserva</th> <th>Data Inicio</th> <th>Data Fim</th> </tr>
+        <tr> <th>ID</th> <th>Tipo serviço</th> <th>Definição serviço</th> <th>Data Inicio</th> <th>Data Fim</th> <th>Reserva</th>  </tr>
         <tbody id="corpoTabelaContratos"> </tbody>
     </table>
 
@@ -68,7 +68,7 @@
             txtId.disabled = true;
             txtTipoServ.disabled = true;
             selectDefServ.disabled = true;
-            // carregarDefSer();
+            carregarDefSer();
             txtDataIni.disabled = true;
             txtDataF.disabled = true;
 			carregarReservas();
@@ -110,11 +110,12 @@
                 alink.href = "javascript:void(0)";
                 alink.onclick =  function() { selecionarContrato(p.id); };
                 celulaId.appendChild(alink);
-                celulaTipoServ.textContent = p.tipoServ;
-                celulaDefServ.textContent = p.defServ.nome;
-                celulaDataIni.textContent = p.dataIni;
-                celulaDataF.textContent = p.dataf;
+                celulaTipoServ.textContent = p.tipoDeServico;
+                celulaDataIni.textContent = p.dataInicio;
+                celulaDataF.textContent = p.dataFim;
 				celulaReserva.textContent = p.reserva.nome
+                celulaReserva.textContent = p.reserva.id
+                celulaDefServ.textContent = p.definicaoServico.id
             }
         }
 
@@ -156,12 +157,15 @@
             paragrafoMensagem.textContent = 'Preencha os dados do novo contrato...';
             criandoNovoContrato = true;
 			carregarReservas();
+            carregarDefSer();
+            
 
             txtId.value = '';
             txtTipoServ.value = '';
             selectDefServ.value = '';
             txtDataIni.value = '';
             txtDataF.value = '';
+            selectDefServ.selectedIndex = -1;
 			selectReserva.selectedIndex = -1;
 
             txtId.disabled = true;
@@ -191,10 +195,10 @@
 
         function criarContrato() {
             const dadosContrato = {
-                'tipoServ': txtTipoServ.value,
-                'defServ': { 'id': selectDefServ.value },
-                'dataIni': txtDataIni.value,
-                'dataIni': txtDataF.value,
+                'tipoDeServico': txtTipoServ.value,
+                'definicaoServico': { 'id': selectDefServ.value },
+                'dataInicio': txtDataIni.value,
+                'dataFim': txtDataF.value,
 				'reserva': { 'id': selectReserva.value }
             };
             const errorHandler = function(error) { 
@@ -228,7 +232,10 @@
             const errorHandler = function(error) { 
                 paragrafoMensagem.textContent = 'Erro ao apagar contrato (código ' + error.message + ')'; 
             } 
-            asyncApagarContrato(id, inicializar, errorHandler);       		
+            asyncApagarReserva(id, inicializar, errorHandler);
+            asyncApagarDefServ(id, inicializar, errorHandler);
+            asyncApagarContrato(id, inicializar, errorHandler);
+      		
         }
 
 		function carregarReservas() {
@@ -236,7 +243,7 @@
                 paragrafoMensagem.textContent = 
 					"Erro ao carregar reservas (código " + error.message + ")";
             }
-            asyncLerContratos(preencherSelectReservas, errorHandler);
+            asyncLerReservas(preencherSelectReservas, errorHandler);
 		}
 		
 		function preencherSelectReservas(reservas) {
@@ -244,9 +251,28 @@
 			var n = reservas.length;
 			for (var i = 0; i < n; i++) {
 				var f = reservas[i];
-				opcoes += `<option value="${f.id}">${f.nome}</option>`
+				opcoes += `<option value="${f.id}">${f.id}</option>`
 			}
 			selectReserva.innerHTML = opcoes;
+		}	
+
+
+        function carregarDefSer() {
+            const errorHandler = function(error) { 
+                paragrafoMensagem.textContent = 
+					"Erro ao carregar definições de serviço (código " + error.message + ")";
+            }
+            asyncLerDefServs(preencherSelectDefServ, errorHandler);
+		}
+		
+		function preencherSelectDefServ(defServ) {
+			var opcoes = '<option disabled selected value> -- selecione uma opção -- </option>';
+			var n = defServ.length;
+			for (var i = 0; i < n; i++) {
+				var f = defServ[i];
+				opcoes += `<option value="${f.id}">${f.id}</option>`
+			}
+			selectDefServ.innerHTML = opcoes;
 		}	
 		
     </script>    

@@ -18,8 +18,8 @@
         <tr> <td>Número do modelo:</td> <td><input type="text" id="txtNumModelo"></td> </tr> 
         
         <tr><td></td><td>
-            <input type="button" value="Salvar" onclick="salvarReserva()" id="btnSalvar">
-            <input type="button" value="Apagar" onclick="apagarReserva()" id="btnApagar">
+            <input type="button" value="Salvar" onclick="salvarDefServ()" id="btnSalvar">
+            <input type="button" value="Apagar" onclick="apagarDefServ()" id="btnApagar">
             <input type="button" value="Cancelar" onclick="cancelarEdicao()" id="btnCancelar">
         </td></tr>
     </table> 
@@ -30,7 +30,7 @@
     <table id="tabelaDefServ">  
         <tr><td><input type="button" 
                        value="Novo" 
-                       onclick="novaReserva()" 
+                       onclick="novaDefServ()" 
                        id="btnNovo"></td> <td></td> <td></td></tr>
         <tr> <th>ID</th> <th>Nome</th> <th> Preço por Hora</th> <th>Descrição</th> <th>Número do modelo</th> </tr>
         <tbody id="corpoTabelaDefServs"> </tbody>
@@ -58,7 +58,7 @@
 
         function inicializar() {
             criandoNovoDefServ = false;
-            paragrafoMensagem.textContent = 'Pressione o botão Novo ou selecione uma reserva da lista:'
+            paragrafoMensagem.textContent = 'Pressione o botão Novo ou selecione uma definição de serviço da lista:'
             txtId.value = '';
             txtNome.value = '';
             txtPrecoHora.value = '';
@@ -76,14 +76,14 @@
             btnCancelar.disabled = true;
 
             tabelaFormulario.style.display = 'none';
-            tabelaReservas.style.display = 'inline';
+            tabelaDefServ.style.display = 'inline';
 
             listarTodosDefServs();            
         }
 
         function listarTodosDefServs() {
             const errorHandler = function(error) { 
-                paragrafoMensagem.textContent = "Erro ao listar reservas (código " + error.message + ")";
+                paragrafoMensagem.textContent = "Erro ao listar definições de serviço (código " + error.message + ")";
             }
             asyncLerDefServs(preencherTabela, errorHandler);
         }
@@ -104,37 +104,37 @@
                 let alink = document.createElement('a');
                 alink.textContent = f.id;
                 alink.href = "javascript:void(0)";
-                alink.onclick =  function() { selecionarReserva(f.id); };
+                alink.onclick =  function() { selecionarDefServ(f.id); };
                 celulaId.appendChild(alink);
                 celulaNome.textContent = f.nome;
                 celulaPrecoHora.textContent = f.precoHora;
-                celulaDescricao.textContent = f.descricao;
-                celulaNumModelo.textContent = f.numModelo;
+                celulaDescricao.textContent = f.descricaoServico;
+                celulaNumModelo.textContent = f.numeroModelo;
             }
         }
 
-        function selecionarReserva(id) {
+        function selecionarDefServ(id) {
             criandoNovoDefServ = false;
             const errorHandler = function(error) { 
-                paragrafoMensagem.textContent = "Erro ao selecionar faculdade (código " + error.message + ")";
+                paragrafoMensagem.textContent = "Erro ao selecionar definição de serviço (código " + error.message + ")";
             }
-            asyncLerFacById(id, preencherFormulario, errorHandler);				
+            asyncLerDefServById(id, preencherFormulario, errorHandler);				
         }
 
-        function preencherFormulario(faculdade) {
+        function preencherFormulario(defServ) {
             paragrafoMensagem.textContent = 
-				'Altere e salve os dados da faculdade, ou então apague o registro da faculdade.'
-            txtId.value = faculdade.id;
-            txtNome.value = faculdade.nome;
-            txtAnoFundacao.value = faculdade.anoFundacao;
-            txtCidade.value = faculdade.cidade;
-			txtEstado.value = faculdade.estado;
+				'Altere e salve os dados da definição de serviço, ou então apague o registro da definição de serviço.'
+            txtId.value = defServ.id;
+            txtNome.value = defServ.nome;
+            txtPrecoHora.value = defServ.precoHora;
+            txtDescricao.value = defServ.descricaoServico;
+			txtNumModelo.value = defServ.numeroModelo;
 			
             txtId.disabled = true;
             txtNome.disabled = false;
-            txtAnoFundacao.disabled = false;
-            txtCidade.disabled = false;
-			txtEstado.disabled = false;
+            txtPrecoHora.disabled = false;
+            txtDescricao.disabled = false;
+			txtNumModelo.disabled = false;
 
             btnNovo.disabled = true;
             btnSalvar.disabled = false;
@@ -142,23 +142,25 @@
             btnCancelar.disabled = false;  
 
             tabelaFormulario.style.display = 'inline';
-            tabelaReservas.style.display = 'none';
+            tabelaDefServ.style.display = 'none';
 
         }
 		
-        function novaReserva() {
-            paragrafoMensagem.textContent = 'Preencha os dados da nova reserva...';
+        function novaDefServ() {
+            paragrafoMensagem.textContent = 'Preencha os dados da nova definição de serviço...';
             criandoNovoDefServ = true;
 
             txtId.value = '';
             txtNome.value = '';
-            txtDataIni.value = '';
-            txtDataFim.value = '';
+            txtPrecoHora.value = '';
+            txtDescricao.value = '';
+            txtNumModelo.value = '';
 			
             txtId.disabled = true;
             txtNome.disabled = false;
-            txtDataIni.disabled = false;
-            txtDataFim.disabled = false;
+            txtPrecoHora.disabled = false;
+            txtDescricao.disabled = false;
+            txtNumModelo.disabled = false;
 			
             btnNovo.disabled = true;
             btnSalvar.disabled = false;
@@ -166,50 +168,51 @@
             btnCancelar.disabled = false;
 
             tabelaFormulario.style.display = 'inline';
-            tabelaReservas.style.display = 'none';
+            tabelaDefServ.style.display = 'none';
         }
 
-        function salvarReserva() {
-            if (criandoNovoDefServ) { criarReserva(); }
-            else { alterarReserva(); }
+        function salvarDefServ() {
+            if (criandoNovoDefServ) { criarDefServ(); }
+            else { alterarDefServ(); }
         }
 
-        function criarReserva() {
-            const dadosReserva = {
+        function criarDefServ() {
+            const dadosDefServ = {
                 'nome': txtNome.value,
-                'dataIni': txtDataIni.value,
-                'dataFim': txtDataFim.value,
+                'precoHora': txtPrecoHora.value,
+                'descricao': txtDescricao.value,
+                'numModelo': txtNumModelo.value,
             };
             const errorHandler = function(error) { 
-                paragrafoMensagem.textContent = 'Erro ao criar nova reserva (código ' + error.message + ')'; 
+                paragrafoMensagem.textContent = 'Erro ao criar nova definição de serviço (código ' + error.message + ')'; 
             }
-            asyncCriarReserva(dadosReserva, inicializar, errorHandler);
+            asyncCriarDefServ(dadosDefServ, inicializar, errorHandler);
         }
 
-        function alterarFaculdade() {
+        function alterarDefServ() {
             const errorHandler = function(error) {
-                paragrafoMensagem.textContent = 'Erro ao alterar faculdade (código ' + error.message + ')'; 
+                paragrafoMensagem.textContent = 'Erro ao alterar definição de serviço (código ' + error.message + ')'; 
             }
-            const dadosReserva = {
+            const dadosDefServ = {
                 'id': txtId.value,
                 'nome': txtNome.value,
-                'anoFundacao': txtAnoFundacao.value,
-                'cidade': txtCidade.value,
-				'estado': txtEstado.value
+                'precoHora': txtPrecoHora.value,
+                'descricao': txtDescricao.value,
+				'numModelo': txtNumModelo.value
             };
-            asyncAlterarFac(dadosReserva, inicializar, errorHandler);        	
+            asyncAlterarDefServ(dadosDefServ, inicializar, errorHandler);        	
         }
 
         function cancelarEdicao() {
             inicializar();
         }
 
-        function apagarFaculdade() {
+        function apagarDefServ() {
             const id = txtId.value;
             const errorHandler = function(error) { 
-                paragrafoMensagem.textContent = 'Erro ao apagar faculdade (código ' + error.message + ')'; 
+                paragrafoMensagem.textContent = 'Erro ao apagar definição de serviço (código ' + error.message + ')'; 
             } 
-            asyncApagarFac(id, inicializar, errorHandler);       		
+            asyncApagarDefServ(id, inicializar, errorHandler);       		
         }
 
     </script>    
