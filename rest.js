@@ -37,17 +37,13 @@ async function asyncLerContratoById(id, proxsucesso, proxerro) {
 }
 
 async function asyncAlterarContrato(dadosContrato, proxsucesso, proxerro) {
-  const URL = `https://Prog2.gabrielzdev.com.br/contratos/${dadosContrato.id}`;
+  const URL = `https://Prog2.gabrielzdev.com.br/contratos/update/${dadosContrato.id}`;
   const putRequest = {
     method: "POST",
     body: JSON.stringify(dadosContrato),
     headers: { "Content-type": "application/json" },
   };
   fetch(URL, putRequest)
-    .then((resposta) => {
-      if (!resposta.ok) throw Error(resposta.status);
-      return resposta;
-    })
     .then((resposta) => resposta.json())
     .then((jsonResponse) => proxsucesso())
     .catch(proxerro);
